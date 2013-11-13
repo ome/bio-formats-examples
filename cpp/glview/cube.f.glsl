@@ -1,3 +1,5 @@
+#version 100
+
 varying vec3 f_texcoord;
 uniform sampler3D texture_r;
 uniform sampler3D texture_g;

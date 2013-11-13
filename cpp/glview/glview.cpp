@@ -1,5 +1,6 @@
-#include <QtWidgets>
-#include <QtOpenGL>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QOpenGLContext>
+
 #include <math.h>
 
 #include "glview.h"
@@ -12,8 +13,48 @@
 
 #include <iostream>
 
+namespace
+{
+  void check_gl(std::string const& message)
+  {
+    GLenum err = GL_NO_ERROR;
+    while ((err = glGetError()) != GL_NO_ERROR)
+      {
+        std::cerr << "GL error (" << message << ") :";
+        switch(err)
+          {
+          case GL_INVALID_ENUM:
+            std::cerr << "Invalid enum";
+            break;
+          case GL_INVALID_VALUE:
+            std::cerr << "Invalid value";
+            break;
+          case GL_INVALID_OPERATION:
+            std::cerr << "Invalid operation";
+            break;
+          case GL_INVALID_FRAMEBUFFER_OPERATION:
+            std::cerr << "Invalid framebuffer operation";
+            break;
+          case GL_OUT_OF_MEMORY:
+            std::cerr << "Out of memory";
+            break;
+          case GL_STACK_UNDERFLOW:
+            std::cerr << "Stack underflow";
+            break;
+          case GL_STACK_OVERFLOW:
+            std::cerr << "Stack overflow";
+            break;
+          default:
+            std::cerr << "Unknown (" << err << ')';
+            break;
+          }
+        std::cerr << std::endl;
+      }
+  }
+}
+
 GLView::GLView(QWidget *parent):
-  QGLWidget(QGLFormat(QGL::SampleBuffers|QGL::Rgba|QGL::AlphaChannel), parent),
+  GLWindow(),
   etimer(),
   xRot(0),
   yRot(0),
@@ -21,8 +62,6 @@ GLView::GLView(QWidget *parent):
   cmax(1.0, 1.0, 1.0),
   depth(0),
   lastPos(0, 0),
-  qtGreen(QColor::fromCmykF(0.40, 0.0, 1.0, 0.0)),
-  qtPurple(QColor::fromCmykF(0.39, 0.39, 0.0, 0.0)),
   vshader(),
   fshader(),
   sprog(),
@@ -32,21 +71,24 @@ GLView::GLView(QWidget *parent):
   uniform_texture_r(),
   uniform_texture_g(),
   uniform_cmax(),
-  vbo_cube_vertices(),
-  vbo_cube_texcoords(),
-  ibo_cube_elements(),
+  vbo_cube_vertices(0),
+  vbo_cube_texcoords(0),
+  ibo_cube_elements(0),
   texture_id_r(),
   texture_id_g()
 {
-  startTimer(0);
-  etimer.start();
 }
 
 GLView::~GLView()
 {
-  glDeleteBuffers(1, &vbo_cube_vertices);
-  glDeleteBuffers(1, &vbo_cube_texcoords);
-  glDeleteBuffers(1, &ibo_cube_elements);
+  makeCurrent();
+
+  if (glIsBuffer(vbo_cube_vertices))
+    glDeleteBuffers(1, &vbo_cube_vertices);
+  if (glIsBuffer(vbo_cube_texcoords))
+    glDeleteBuffers(1, &vbo_cube_texcoords);
+  if (glIsBuffer(ibo_cube_elements))
+    glDeleteBuffers(1, &ibo_cube_elements);
 }
 
 QSize GLView::minimumSizeHint() const
@@ -73,7 +115,7 @@ void GLView::setXRotation(int angle)
   if (angle != xRot) {
     xRot = angle;
     emit xRotationChanged(angle);
-    updateGL();
+    renderLater();
   }
 }
 
@@ -83,7 +125,7 @@ void GLView::setYRotation(int angle)
   if (angle != yRot) {
     yRot = angle;
     emit yRotationChanged(angle);
-    updateGL();
+    renderLater();
   }
 }
 
@@ -93,7 +135,7 @@ void GLView::setZRotation(int angle)
   if (angle != zRot) {
     zRot = angle;
     emit zRotationChanged(angle);
-    updateGL();
+    renderLater();
   }
 }
 
@@ -105,7 +147,7 @@ void GLView::setChannelMin(int min)
     {
       cmax[0] = v;
       emit channelMinChanged(min);
-      updateGL();
+      renderLater();
     }
 }
 
@@ -116,7 +158,7 @@ void GLView::setChannelMax(int max)
     {
       cmax[1] = v;
       emit channelMaxChanged(max);
-      updateGL();
+      renderLater();
     }
 }
 
@@ -127,31 +169,32 @@ void GLView::setZCut(int cut)
     {
       depth = cut;
       emit zCutChanged(cut);
-      updateGL();
+      renderLater();
     }
 }
 
-void GLView::initializeGL()
+void GLView::initialize()
 {
-  qglClearColor(qtPurple.dark());
-
   glEnable(GL_DEPTH_TEST);
+  check_gl("Enable depth test");
   glEnable(GL_CULL_FACE);
-  glShadeModel(GL_SMOOTH);
+  check_gl("Enable cull face");
   glEnable(GL_MULTISAMPLE);
+  check_gl("Enable multisampling");
   glEnable(GL_BLEND);
+  check_gl("Enable blending");
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-  glEnable(GL_TEXTURE_3D);
+  check_gl("Set blend function");
 
   vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
-  vshader->compileSourceFile("/Users/rleigh/code/qtgltest/cube.v.glsl");
+  vshader->compileSourceFile("../cube.v.glsl");
   if (!vshader->isCompiled())
     {
       std::cerr << "Failed to compile vertex shader\n" << vshader->log().toStdString() << std::endl;
     }
 
   fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
-  fshader->compileSourceFile("/Users/rleigh/code/qtgltest/cube.f.glsl");
+  fshader->compileSourceFile("../cube.f.glsl");
   if (!fshader->isCompiled())
     {
       std::cerr << "Failed to compile fragment shader\n" << fshader->log().toStdString() << std::endl;
@@ -196,8 +239,11 @@ void GLView::initializeGL()
   glm::vec2 zlim(-72.0*1.772701, 72.0*1.772701);
 
   glGenBuffers(1, &vbo_cube_vertices);
+  check_gl("Generate cube vertex buffer");
   glGenBuffers(1, &vbo_cube_texcoords);
+  check_gl("Generate cube texture coords buffer");
   glGenBuffers(1, &ibo_cube_elements);
+  check_gl("Generate cube elements buffer");
   buffer_cube(vbo_cube_vertices, vbo_cube_texcoords, ibo_cube_elements,
               xlim, ylim, zlim);
 
@@ -205,7 +251,7 @@ void GLView::initializeGL()
   glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &max_combined_texture_image_units);
   std::cout << "Texture unit count: " << max_combined_texture_image_units << std::endl;
 
-  TIFF *tiff = TIFFOpen("/Users/rleigh/code/qtgltest/vessels.ome.tiff", "r");
+  TIFF *tiff = TIFFOpen("../vessels.ome.tiff", "r");
   if (tiff == 0) {
     std::cerr << "Error opening tiff" << std::endl;
   }
@@ -230,12 +276,19 @@ void GLView::initializeGL()
 
   {
     glGenTextures(1, &texture_id_r);
+    check_gl("Generate texture");
     glBindTexture(GL_TEXTURE_3D, texture_id_r);
+    check_gl("Bind texture");
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    check_gl("Set texture min filter");
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    check_gl("Set texture mag filter");
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    check_gl("Set texture wrap s");
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    check_gl("Set texture wrap t");
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    check_gl("Set texture wrap r");
     glTexImage3D(GL_TEXTURE_3D, // target
                  0,  // level, 0 = base, no minimap,
                  GL_R16, // internalformat
@@ -246,11 +299,7 @@ void GLView::initializeGL()
                  GL_RED,  // format
                  GL_UNSIGNED_SHORT, // type
                  0);
-    GLenum e = glGetError();
-    if (e != GL_NO_ERROR)
-      {
-        std::cout << "Texture load error: " << e << std::endl;
-      }
+    check_gl("Texture create");
 
     if (pixels != 0)
       {
@@ -259,7 +308,8 @@ void GLView::initializeGL()
             int ok = TIFFSetDirectory(tiff, ifd);
             if (!ok)
               std::cout << "Error setting TIFF directory to " << ifd << std::endl;
-            std::cout << "Reading IFD " << ifd << " (plane " << z << ")" << std::endl;
+            //            std::cout << "Reading IFD " << ifd << " (plane " << z << ")" << std::endl;
+            std::cout << '.';
 
             for (tstrip_t nstrip = 0, y=0; nstrip < strips; nstrip++, y+=striprows)
               {
@@ -273,23 +323,33 @@ void GLView::initializeGL()
                                 GL_RED,  // format
                                 GL_UNSIGNED_SHORT, // type
                                 pixels);
+                check_gl("Texture set pixels in subregion");
               }
           }
+        std::cout << " done.\n";
       }
     else
       std::cerr << "Not allocated tiff pixel buffer" << std::endl;
     std::cout << "Texture loaded" << std::endl;
     glGenerateMipmap(GL_TEXTURE_3D);
+    check_gl("Generate mipmaps");
   }
 
   {
     glGenTextures(1, &texture_id_g);
+    check_gl("Generate texture");
     glBindTexture(GL_TEXTURE_3D, texture_id_g);
+    check_gl("Bind texture");
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    check_gl("Set texture min filter");
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    check_gl("Set texture mag filter");
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    check_gl("Set texture wrap s");
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    check_gl("Set texture wrap t");
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    check_gl("Set texture wrap r");
     glTexImage3D(GL_TEXTURE_3D, // target
                  0,  // level, 0 = base, no minimap,
                  GL_R16, // internalformat
@@ -300,11 +360,7 @@ void GLView::initializeGL()
                  GL_RED,  // format
                  GL_UNSIGNED_SHORT, // type
                  0);
-    GLenum e = glGetError();
-    if (e != GL_NO_ERROR)
-      {
-        std::cout << "Texture load error: " << e << std::endl;
-      }
+    check_gl("Texture create");
 
     if (pixels != 0)
       {
@@ -313,7 +369,8 @@ void GLView::initializeGL()
             int ok = TIFFSetDirectory(tiff, ifd);
             if (!ok)
               std::cout << "Error setting TIFF directory to " << ifd << std::endl;
-            std::cout << "Reading IFD " << ifd << " (plane " << z << ")" << std::endl;
+            //            std::cout << "Reading IFD " << ifd << " (plane " << z << ")" << std::endl;
+            std::cout << '.';
 
             for (tstrip_t nstrip = 0, y=0; nstrip < strips; nstrip++, y+=striprows)
               {
@@ -327,24 +384,35 @@ void GLView::initializeGL()
                                 GL_RED,  // format
                                 GL_UNSIGNED_SHORT, // type
                                 pixels);
+                check_gl("Texture set pixels in subregion");
               }
           }
+        std::cout << " done.\n";
       }
     else
       std::cerr << "Not allocated tiff pixel buffer" << std::endl;
     std::cout << "Texture loaded" << std::endl;
     glGenerateMipmap(GL_TEXTURE_3D);
+    check_gl("Generate mipmaps");
   }
   _TIFFfree(pixels);
   TIFFClose(tiff);
+
+  // Start timers
+  startTimer(0);
+  etimer.start();
+
+  // Size viewport
+  resize();
 }
 
-void GLView::buffer_cube(unsigned int vbo_vertices,
-                         unsigned int vbo_texcoords,
-                         unsigned int ibo_elements,
-                         glm::vec2 xlim,
-                         glm::vec2 ylim,
-                         glm::vec2 zlim)
+void
+GLView::buffer_cube(unsigned int vbo_vertices,
+                    unsigned int vbo_texcoords,
+                    unsigned int ibo_elements,
+                    glm::vec2 xlim,
+                    glm::vec2 ylim,
+                    glm::vec2 zlim)
 {
   GLfloat cube_vertices[] = {
     // front
@@ -380,7 +448,9 @@ void GLView::buffer_cube(unsigned int vbo_vertices,
   };
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_vertices);
+  check_gl("Bind vertex buffer");
   glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_DYNAMIC_DRAW);
+  check_gl("Set vertex buffer");
 
   glm::vec2 texxlim(0.0, 1.0);
   glm::vec2 texylim(0.0, 1.0);
@@ -419,7 +489,9 @@ void GLView::buffer_cube(unsigned int vbo_vertices,
   };
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo_texcoords);
+  check_gl("Bind texture coords buffer");
   glBufferData(GL_ARRAY_BUFFER, sizeof(cube_texcoords), cube_texcoords, GL_DYNAMIC_DRAW);
+  check_gl("Set texture coords buffer");
 
   GLushort cube_elements[] = {
     // front
@@ -442,35 +514,52 @@ void GLView::buffer_cube(unsigned int vbo_vertices,
     22, 23, 20,
   };
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_elements);
+  check_gl("Bind elements buffer");
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(cube_elements), cube_elements, GL_DYNAMIC_DRAW);
+  check_gl("Set elements buffer");
 }
 
-void GLView::paintGL()
+void
+GLView::render()
 {
   glClearColor(1.0, 1.0, 1.0, 1.0);
+  check_gl("Clear colour");
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  check_gl("Clear buffers");
 
   sprog->bind();
 
   glActiveTexture(GL_TEXTURE0);
+  check_gl("Activate texture 0");
   glBindTexture(GL_TEXTURE_3D, texture_id_r);
+  check_gl("Bind texture 0");
   glUniform1i(uniform_texture_r, /*GL_TEXTURE*/1);
+  check_gl("Set uniform 0");
   glActiveTexture(GL_TEXTURE1);
+  check_gl("Activate texture 1");
   glBindTexture(GL_TEXTURE_3D, texture_id_g);
+  check_gl("Bind texture 1");
   glUniform1i(uniform_texture_g, /*GL_TEXTURE*/0);
-  glUniform3fv(uniform_cmax, 3, &cmax[0]);
+  check_gl("Set uniform 1");
+  glUniform3fv(uniform_cmax, 1, glm::value_ptr(cmax));
+  check_gl("Set uniform 2");
 
   glEnableVertexAttribArray(attr_coordloc);
+  check_gl("Enable coords array");
   glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_vertices);
+  check_gl("Bind coords array");
   glVertexAttribPointer(attr_coordloc, // attribute
                         3,             // number of elements per vertex, here (x,y,z)
                         GL_FLOAT,      // the type of each element
                         GL_FALSE,      // take our values as-is
                         0,             // no extra data between each position
                         0);            // offset of first element
+  check_gl("Set coords array");
 
   glEnableVertexAttribArray(attr_texcoord);
+  check_gl("Enable texture coords array");
   glBindBuffer(GL_ARRAY_BUFFER, vbo_cube_texcoords);
+  check_gl("Enable bind coords array");
   glVertexAttribPointer(
         attr_texcoord, // attribute
         3,                 // number of elements per vertex, here (R,G,B)
@@ -478,21 +567,24 @@ void GLView::paintGL()
         GL_FALSE,          // take our values as-is
         0,                 // no extra data between each position
         0);                // offset of first element
+  check_gl("Set texture coords array");
 
   // Push each element in buffer_vertices to the vertex shader
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo_cube_elements);
+  check_gl("Bind elements array");
   int size;  glGetBufferParameteriv(GL_ELEMENT_ARRAY_BUFFER, GL_BUFFER_SIZE, &size);
   glDrawElements(GL_TRIANGLES, size/sizeof(GLushort), GL_UNSIGNED_SHORT, 0);
 
-  glDrawArrays(GL_TRIANGLES, 0, 3);
   glDisableVertexAttribArray(attr_texcoord);
   glDisableVertexAttribArray(attr_coordloc);
 }
 
-void GLView::resizeGL(int width, int height)
+void GLView::resize()
 {
-  glViewport(0, 0, width, height);
+  QSize newsize = size();
+  glViewport(0, 0, newsize.width(), newsize.height());
 }
+
 
 void GLView::mousePressEvent(QMouseEvent *event)
 {
@@ -518,6 +610,7 @@ void GLView::timerEvent (QTimerEvent *event)
 {
   //int64_t elapsed = etimer.elapsed();
   QSize s = size();
+  // Size may be zero if the window is not yet mapped.
 
   //float angle = elapsed / 1000.0 * 1;  // 1° per second
   glm::vec3 axis_x(1, 0, 0);
@@ -535,12 +628,12 @@ void GLView::timerEvent (QTimerEvent *event)
   sprog->bind();
   glUniformMatrix4fv(uniform_mvp, 1, GL_FALSE, glm::value_ptr(mvp));
 
-  QGLWidget::timerEvent(event);
+  GLWindow::timerEvent(event);
 
   glm::vec2 xlim(-512.0, 512.0);
   glm::vec2 ylim(-512.0, 512.0);
   glm::vec2 zlim(-72.0*1.772701, ((144.0-depth)-72.0)*1.772701);
   buffer_cube(vbo_cube_vertices, vbo_cube_texcoords, ibo_cube_elements, xlim, ylim, zlim);
 
-  updateGL();
+  renderLater();
 }

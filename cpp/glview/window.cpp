@@ -7,6 +7,10 @@ Window::Window()
 {
   glView = new GLView;
 
+  QWidget *glContainer = QWidget::createWindowContainer(glView);
+  // We need a minimum size or else the size defaults to zero.
+  glContainer->setMinimumSize(512, 512);
+
   xSlider = createAngleSlider();
   ySlider = createAngleSlider();
   zSlider = createAngleSlider();
@@ -32,7 +36,7 @@ Window::Window()
   connect(glView, SIGNAL(zCutChanged(int)), cutSlider, SLOT(setValue(int)));
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
-  mainLayout->addWidget(glView);
+  mainLayout->addWidget(glContainer);
   mainLayout->addWidget(xSlider);
   mainLayout->addWidget(ySlider);
   mainLayout->addWidget(zSlider);

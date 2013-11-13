@@ -1,13 +1,14 @@
 #ifndef GLVIEW_H
 #define GLVIEW_H
 
-#include <QGLWidget>
+#include "glwindow.h"
+
 #include <QOpenGLShader>
 #include <QElapsedTimer>
 
 #include <glm/glm.hpp>
 
-class GLView : public QGLWidget
+class GLView : public GLWindow
 {
   Q_OBJECT;
 
@@ -35,9 +36,10 @@ signals:
   void zCutChanged(int cut);
 
 protected:
-  void initializeGL();
-  void paintGL();
-  void resizeGL(int width, int height);
+  void initialize();
+  void render();
+  void resize();
+
   void mousePressEvent(QMouseEvent *event);
   void mouseMoveEvent(QMouseEvent *event);
   void timerEvent (QTimerEvent *event);
@@ -57,8 +59,6 @@ private:
   glm::vec3 cmax;
   int depth;
   QPoint lastPos;
-  QColor qtGreen;
-  QColor qtPurple;
   QOpenGLShader *vshader;
   QOpenGLShader *fshader;
   QOpenGLShaderProgram *sprog;
@@ -76,3 +76,9 @@ private:
 };
 
 #endif // GLVIEW_H
+
+/*
+ * Local Variables:
+ * mode:C++
+ * End:
+ */
