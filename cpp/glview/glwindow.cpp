@@ -85,7 +85,8 @@ GLWindow::exposeEvent(QExposeEvent *event)
 
 void GLWindow::resizeEvent(QResizeEvent * event)
 {
-  resize();
+  if (glcontext)
+    resize();
 }
 
 QOpenGLContext *
