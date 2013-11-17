@@ -1,4 +1,4 @@
-#version 100
+#version 110
 
 attribute vec3 coord3d;
 attribute vec3 texcoord;
