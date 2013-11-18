@@ -149,6 +149,8 @@ void GLView::setChannelMin(int min)
       emit channelMinChanged(min);
       renderLater();
     }
+  if (cmax[0] > cmax[1])
+    setChannelMax(min);
 }
 
 void GLView::setChannelMax(int max)
@@ -160,6 +162,8 @@ void GLView::setChannelMax(int max)
       emit channelMaxChanged(max);
       renderLater();
     }
+  if (cmax[1] < cmax[0])
+  setChannelMin(max);
 }
 
 
