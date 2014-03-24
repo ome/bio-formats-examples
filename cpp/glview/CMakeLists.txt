@@ -14,7 +14,7 @@ include(FindOpenGL)
 
 include_directories(${OPENGL_INCLUDE_DIR})
 
-SET(glview_SOURCES main.cpp window.cpp glwindow.cpp glview3d.cpp)
+SET(glview_SOURCES main.cpp window.cpp glwindow.cpp glview2d.cpp glview3d.cpp)
 SET(glview_HEADERS window.h glwindow.h glview.h)
 
 add_executable(glview ${glview_SOURCES} ${glview_HEADERS_MOC} ${glview_RESOURCES})
