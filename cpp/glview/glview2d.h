@@ -6,6 +6,8 @@
 #include <QOpenGLShader>
 #include <QElapsedTimer>
 
+#include <tiffio.h>
+
 #include <glm/glm.hpp>
 
 class GLView2D : public GLWindow
@@ -44,12 +46,13 @@ protected:
   void mouseMoveEvent(QMouseEvent *event);
   void timerEvent (QTimerEvent *event);
 
-  void buffer_cube(unsigned int vbo_vertices,
-                   unsigned int vbo_texcoords,
-                   unsigned int ibo_elements,
-                   glm::vec2 xlim,
-                   glm::vec2 ylim,
-                   glm::vec2 zlim);
+  void read_plane();
+
+  void buffer_square(unsigned int vbo_vertices,
+                     unsigned int vbo_texcoords,
+                     unsigned int ibo_elements,
+                     glm::vec2 xlim,
+                     glm::vec2 ylim);
 
 private:
   QElapsedTimer etimer;
@@ -58,6 +61,7 @@ private:
   int zRot;
   glm::vec3 cmax;
   int depth;
+  int olddepth;
   QPoint lastPos;
   QOpenGLShader *vshader;
   QOpenGLShader *fshader;
@@ -68,11 +72,13 @@ private:
   int uniform_texture_r;
   int uniform_texture_g;
   int uniform_cmax;
-  unsigned int vbo_cube_vertices;
-  unsigned int vbo_cube_texcoords;
-  unsigned int ibo_cube_elements;
+  unsigned int vbo_square_vertices;
+  unsigned int vbo_square_texcoords;
+  unsigned int ibo_square_elements;
   unsigned int texture_id_r;
   unsigned int texture_id_g;
+  TIFF *tiff;
+  uint16_t *pixels;
 };
 
 #endif // GLVIEW2D_H

@@ -83,7 +83,7 @@ QSlider *Window::createRangeSlider()
 QSlider *Window::createCutSlider()
 {
   QSlider *slider = new QSlider(Qt::Vertical);
-  slider->setRange(0, 144);
+  slider->setRange(0, 143);
   slider->setSingleStep(1);
   slider->setPageStep(8);
   slider->setTickInterval(8);
