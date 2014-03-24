@@ -1,11 +1,10 @@
 #include <QtWidgets>
 
-#include "glview.h"
 #include "window.h"
 
 Window::Window()
 {
-  glView = new GLView;
+  glView = new GLView3D;
 
   QWidget *glContainer = QWidget::createWindowContainer(glView);
   // We need a minimum size or else the size defaults to zero.
