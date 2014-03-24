@@ -4,7 +4,7 @@
 
 Window::Window()
 {
-  glView = new GLView3D;
+  glView = new GLView2D;
 
   QWidget *glContainer = QWidget::createWindowContainer(glView);
   // We need a minimum size or else the size defaults to zero.

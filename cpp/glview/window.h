@@ -2,7 +2,7 @@
 #define WINDOW_H
 
 #include <QWidget>
-#include "glview3d.h"
+#include "glview2d.h"
 
 QT_BEGIN_NAMESPACE
 class QSlider;
@@ -24,7 +24,7 @@ private:
   QSlider *createRangeSlider();
   QSlider *createCutSlider();
 
-  GLView3D *glView;
+  GLView2D *glView;
   QSlider *xSlider;
   QSlider *ySlider;
   QSlider *zSlider;
