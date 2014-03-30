@@ -1,15 +1,18 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <QWidget>
+#include <QMainWindow>
 #include "glview2d.h"
 
 QT_BEGIN_NAMESPACE
 class QSlider;
+class QMenu;
+class QAction;
+class QActionGroup;
 QT_END_NAMESPACE
 class GLView3D;
 
-class Window : public QWidget
+class Window : public QMainWindow
 {
   Q_OBJECT;
 
@@ -19,7 +22,31 @@ public:
 protected:
   void keyPressEvent(QKeyEvent *event);
 
+private slots:
+  void open();
+  void quit();
+  void view_reset();
+  void view_zoom();
+  void view_pan();
+  void view_rotate();
+
 private:
+  void createActions();
+  void createMenus();
+
+  QMenu *fileMenu;
+  QMenu *viewMenu;
+
+  QAction *openAction;
+  QAction *quitAction;
+
+  QAction *viewResetAction;
+
+  QActionGroup *viewActionGroup;
+  QAction *viewZoomAction;
+  QAction *viewPanAction;
+  QAction *viewRotateAction;
+
   QSlider *createAngleSlider();
   QSlider *createRangeSlider();
   QSlider *createCutSlider();

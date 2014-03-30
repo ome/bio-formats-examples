@@ -4,6 +4,9 @@
 
 Window::Window()
 {
+  createActions();
+  createMenus();
+
   glView = new GLView2D;
 
   QWidget *glContainer = QWidget::createWindowContainer(glView);
@@ -43,7 +46,10 @@ Window::Window()
   mainLayout->addWidget(maxSlider);
   mainLayout->addWidget(cutSlider);
 
-  setLayout(mainLayout);
+  QWidget *central = new QWidget(this);
+  central->setLayout(mainLayout);
+
+  setCentralWidget(central);
 
   xSlider->setValue(160 * 16);
   ySlider->setValue(180 * 16);
@@ -55,6 +61,63 @@ Window::Window()
   cutSlider->setValue(0);
 
   setWindowTitle(tr("Bio-Formats GLView"));
+}
+
+void Window::createActions()
+{
+  openAction = new QAction(tr("&Open image..."), this);
+  openAction->setShortcuts(QKeySequence::Open);
+  openAction->setStatusTip(tr("Open an existing image file"));
+  connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+
+  quitAction = new QAction(tr("&Quit..."), this);
+  quitAction->setShortcuts(QKeySequence::Quit);
+  quitAction->setStatusTip(tr("Quit the application"));
+  connect(quitAction, SIGNAL(triggered()), this, SLOT(quit()));
+
+  viewResetAction = new QAction(tr("&Reset..."), this);
+  viewResetAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_R));
+  viewResetAction->setStatusTip(tr("Reset the current view"));
+  connect(viewResetAction, SIGNAL(triggered()), this, SLOT(view_reset()));
+
+  viewZoomAction = new QAction(tr("&Zoom..."), this);
+  viewZoomAction->setCheckable(true);
+  viewZoomAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_Z));
+  viewZoomAction->setStatusTip(tr("Zoom the current view"));
+  connect(viewZoomAction, SIGNAL(triggered()), this, SLOT(view_zoom()));
+
+  viewPanAction = new QAction(tr("&Pan..."), this);
+  viewPanAction->setCheckable(true);
+  viewPanAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_P));
+  viewPanAction->setStatusTip(tr("Pan the current view"));
+  connect(viewPanAction, SIGNAL(triggered()), this, SLOT(view_pan()));
+
+  viewRotateAction = new QAction(tr("Rota&te..."), this);
+  viewRotateAction->setCheckable(true);
+  viewRotateAction->setShortcut(QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_T));
+  viewRotateAction->setStatusTip(tr("Rotate the current view"));
+  connect(viewRotateAction, SIGNAL(triggered()), this, SLOT(view_rotate()));
+
+  viewActionGroup = new QActionGroup(this);
+  viewActionGroup->addAction(viewZoomAction);
+  viewActionGroup->addAction(viewPanAction);
+  viewActionGroup->addAction(viewRotateAction);
+  viewZoomAction->setChecked(true);
+}
+
+void Window::createMenus()
+{
+  fileMenu = menuBar()->addMenu(tr("&File"));
+  fileMenu->addAction(openAction);
+  fileMenu->addSeparator();
+  fileMenu->addAction(quitAction);
+
+  viewMenu = menuBar()->addMenu(tr("&View"));
+  viewMenu->addAction(viewResetAction);
+  fileMenu->addSeparator();
+  viewMenu->addAction(viewZoomAction);
+  viewMenu->addAction(viewPanAction);
+  viewMenu->addAction(viewRotateAction);
 }
 
 QSlider *Window::createAngleSlider()
@@ -94,7 +157,32 @@ QSlider *Window::createCutSlider()
 void Window::keyPressEvent(QKeyEvent *e)
 {
   if (e->key() == Qt::Key_Escape)
-    close();
+    quit();
   else
     QWidget::keyPressEvent(e);
+}
+
+void Window::open()
+{
+}
+
+void Window::quit()
+{
+  close();
+}
+
+void Window::view_reset()
+{
+}
+
+void Window::view_zoom()
+{
+}
+
+void Window::view_pan()
+{
+}
+
+void Window::view_rotate()
+{
 }
