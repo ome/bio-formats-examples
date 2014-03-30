@@ -15,6 +15,13 @@ class GLView2D : public GLWindow
   Q_OBJECT;
 
 public:
+  enum MouseMode
+    {
+      MODE_ZOOM,
+      MODE_PAN,
+      MODE_ROTATE
+    };
+
   GLView2D(QWidget *parent = 0);
   ~GLView2D();
 
@@ -22,16 +29,22 @@ public:
   QSize sizeHint() const;
 
 public slots:
-  void setXRotation(int angle);
-  void setYRotation(int angle);
+  void setZoom(int zoom);
+  void setXTranslation(int xtran);
+  void setYTranslation(int ytran);
   void setZRotation(int angle);
   void setChannelMin(int min);
   void setChannelMax(int max);
   void setZCut(int cut);
+  void setMouseMode(MouseMode mode);
+
+public:
+  MouseMode getMouseMode() const;
 
 signals:
-  void xRotationChanged(int angle);
-  void yRotationChanged(int angle);
+  void zoomChanged(int zoom);
+  void xTranslationChanged(int xtran);
+  void yTranslationChanged(int ytran);
   void zRotationChanged(int angle);
   void channelMinChanged(int min);
   void channelMaxChanged(int max);
@@ -55,9 +68,11 @@ protected:
                      glm::vec2 ylim);
 
 private:
+  MouseMode mouseMode;
   QElapsedTimer etimer;
-  int xRot;
-  int yRot;
+  int zoom;
+  int xTran;
+  int yTran;
   int zRot;
   glm::vec3 cmax;
   int depth;

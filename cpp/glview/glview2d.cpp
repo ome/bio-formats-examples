@@ -1,10 +1,11 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QOpenGLContext>
 
-#include <math.h>
+#include <cmath>
 
 #include "glview2d.h"
 
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -53,12 +54,15 @@ namespace
 
 GLView2D::GLView2D(QWidget *parent):
   GLWindow(),
+  mouseMode(MODE_ZOOM),
   etimer(),
-  xRot(0),
-  yRot(0),
+  zoom(0),
+  xTran(0),
+  yTran(0),
   zRot(0),
   cmax(1.0, 1.0, 1.0),
   depth(0),
+  olddepth(-1),
   lastPos(0, 0),
   vshader(),
   fshader(),
@@ -115,22 +119,29 @@ static void qNormalizeAngle(int &angle)
     angle -= 360 * 16;
 }
 
-void GLView2D::setXRotation(int angle)
+void GLView2D::setZoom(int zoom)
 {
-  qNormalizeAngle(angle);
-  if (angle != xRot) {
-    xRot = angle;
-    emit xRotationChanged(angle);
+  if (zoom != this->zoom) {
+    this->zoom = zoom;
+    emit zoomChanged(zoom);
     renderLater();
   }
 }
 
-void GLView2D::setYRotation(int angle)
+void GLView2D::setXTranslation(int xtran)
 {
-  qNormalizeAngle(angle);
-  if (angle != yRot) {
-    yRot = angle;
-    emit yRotationChanged(angle);
+  if (xtran != xTran) {
+    xTran = xtran;
+    emit xTranslationChanged(xtran);
+    renderLater();
+  }
+}
+
+void GLView2D::setYTranslation(int ytran)
+{
+  if (ytran != yTran) {
+    yTran = ytran;
+    emit yTranslationChanged(ytran);
     renderLater();
   }
 }
@@ -145,6 +156,17 @@ void GLView2D::setZRotation(int angle)
   }
 }
 
+void
+GLView2D::setMouseMode(MouseMode mode)
+{
+  mouseMode = mode;
+}
+
+GLView2D::MouseMode
+GLView2D::getMouseMode() const
+{
+  return mouseMode;
+}
 
 void GLView2D::setChannelMin(int min)
 {
@@ -244,8 +266,8 @@ void GLView2D::initialize()
   if (uniform_cmax == -1)
     std::cerr << "Failed to bind cmax" << std::endl;
 
-  glm::vec2 xlim(-512.0, 512.0);
-  glm::vec2 ylim(-512.0, 512.0);
+  glm::vec2 xlim(0.0, 1024.0);
+  glm::vec2 ylim(0.0, 1024.0);
 
   glGenBuffers(1, &vbo_square_vertices);
   check_gl("Generate square vertex buffer");
@@ -382,7 +404,6 @@ GLView2D::buffer_square(unsigned int vbo_vertices,
                         glm::vec2 ylim)
 {
   GLfloat square_vertices[] = {
-    // front
     xlim[0], ylim[0],
     xlim[1], ylim[0],
     xlim[1], ylim[1],
@@ -397,7 +418,6 @@ GLView2D::buffer_square(unsigned int vbo_vertices,
   glm::vec2 texxlim(0.0, 1.0);
   glm::vec2 texylim(0.0, 1.0);
   GLfloat square_texcoords[] = {
-    // front
     texxlim[0], texylim[0],
     texxlim[1], texylim[0],
     texxlim[1], texylim[1],
@@ -498,33 +518,78 @@ void GLView2D::mouseMoveEvent(QMouseEvent *event)
   int dy = event->y() - lastPos.y();
 
   if (event->buttons() & Qt::LeftButton) {
-    setXRotation(xRot + 8 * dy);
-    setYRotation(yRot + 8 * -dx);
-  } else if (event->buttons() & Qt::RightButton) {
-    setXRotation(xRot + 8 * dy);
-    setZRotation(zRot + 8 * -dx);
+    switch (mouseMode)
+      {
+      case MODE_ZOOM:
+        setZoom(zoom + 8 * dy);
+        break;
+      case MODE_PAN:
+        setXTranslation(xTran + 8 *  dx);
+        setYTranslation(yTran + 8 * -dy);
+        break;
+      case MODE_ROTATE:
+        setZRotation(zRot + 8 * -dy);
+        break;
+      }
   }
   lastPos = event->pos();
 }
 
 void GLView2D::timerEvent (QTimerEvent *event)
 {
+  // Convert linear signed zoom value to a factor.
+  float zoomfactor = std::exp(static_cast<float>(zoom)/1024.0);
+
+  // Window size.  Size may be zero if the window is not yet mapped.
   QSize s = size();
-  // Size may be zero if the window is not yet mapped.
 
-  glm::vec2 xlim(-512.0, 512.0);
-  glm::vec2 ylim(-512.0, 512.0);
+  glm::vec2 xlim(0, 1024.0);
+  glm::vec2 ylim(0, 1024.0);
+  float maxsize = std::max(xlim[1], ylim[1]);
 
-  glm::mat4 model = glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(0.0, 0.0, 0.0)), glm::vec3(1.0/1024.0, 1.0/1024.0, 1.0/1024.0));
-  glm::mat4 view = glm::lookAt(glm::vec3(0.0, 0.0, 1.0),
-                               glm::vec3(0.0, 0.0, 0.0),
+  float minsize = static_cast<float>(std::min(s.width(), s.height()));
+  float range = (maxsize/minsize) * 2.0;
+  float xrange = (static_cast<float>(s.width())/(minsize * 2.0)) * (maxsize);
+  float yrange = (static_cast<float>(s.height())/(minsize * 2.0)) * (maxsize);
+
+  std::cout << "XS = " << s.width() << "  YS = " << s.height() << std::endl;
+  std::cout << "XR = " << xrange << "  YR = " << yrange << std::endl;
+
+  glm::vec3 axis_z(0, 0, 1);
+
+
+  glm::mat4 rotate = glm::translate(glm::rotate(glm::translate(glm::mat4(1.0f),
+                                                               glm::vec3(xlim[1]/2.0,
+                                                                         ylim[1]/2.0,
+                                                                         0.0)),
+                                                glm::radians(static_cast<float>(zRot)/16.0f),
+                                                axis_z),
+                                    glm::vec3(-xlim[1]/2.0,
+                                              -ylim[1]/2.0,
+                                              0.0));
+
+  glm::mat4 scale = glm::translate(glm::scale(glm::translate(glm::mat4(1.0f),
+                                                             glm::vec3(xlim[1]/2.0,
+                                                                         ylim[1]/2.0,
+                                                                         0.0)),
+                                              glm::vec3(zoomfactor)),
+                                   glm::vec3(-xlim[1]/2.0,
+                                             -ylim[1]/2.0,
+                                             0.0));
+
+  glm::mat4 translate = glm::translate(glm::mat4(1.0f),
+                                       glm::vec3(static_cast<float>(xTran),
+                                                 static_cast<float>(yTran),
+                                                 0.0));
+
+  glm::mat4 model = translate * rotate * scale;
+
+  glm::mat4 view = glm::lookAt(glm::vec3(512.0, 512.0, 10.0),
+                               glm::vec3(512.0, 512.0, 0.0),
                                glm::vec3(0.0, 1.0, 0.0));
 
-  float range = static_cast<float>(std::min(s.width(), s.height())) * 2.0f;
-  glm::mat4 projection = glm::ortho(-static_cast<float>(s.width())/range,
-                                    static_cast<float>(s.width())/range,
-                                    -static_cast<float>(s.height())/range,
-                                    static_cast<float>(s.height())/range,
+  glm::mat4 projection = glm::ortho(-xrange, xrange,
+                                    -yrange, yrange,
                                     -10.0f, 10.0f);
 
   glm::mat4 mvp = projection * view * model;

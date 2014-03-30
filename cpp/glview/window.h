@@ -19,9 +19,6 @@ class Window : public QMainWindow
 public:
   Window();
 
-protected:
-  void keyPressEvent(QKeyEvent *event);
-
 private slots:
   void open();
   void quit();
@@ -52,12 +49,15 @@ private:
   QSlider *createCutSlider();
 
   GLView2D *glView;
-  QSlider *xSlider;
-  QSlider *ySlider;
-  QSlider *zSlider;
   QSlider *minSlider;
   QSlider *maxSlider;
   QSlider *cutSlider;
 };
 
 #endif // WINDOW_H
+
+/*
+ * Local Variables:
+ * mode:C++
+ * End:
+ */
