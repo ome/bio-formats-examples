@@ -72,8 +72,7 @@ GLView2D::GLView2D(QWidget *parent):
   vbo_square_vertices(0),
   vbo_square_texcoords(0),
   ibo_square_elements(0),
-  texture_id_r(),
-  texture_id_g(),
+  texture_id(),
   tiff(TIFFOpen("../vessels.ome.tiff", "r"))
 {
   if (tiff == 0) {
@@ -284,37 +283,11 @@ void GLView2D::initialize()
   pixels = (uint16_t *) _TIFFmalloc(stripsize);
   std::cout << "Alloc: " << npixels * sizeof (uint16_t) << std::endl;
 
+  for (unsigned int i = 0; i < 2; ++i)
   {
-    glGenTextures(1, &texture_id_r);
+    glGenTextures(1, &texture_id[i]);
     check_gl("Generate texture");
-    glBindTexture(GL_TEXTURE_2D, texture_id_r);
-    check_gl("Bind texture");
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    check_gl("Set texture min filter");
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    check_gl("Set texture mag filter");
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    check_gl("Set texture wrap s");
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    check_gl("Set texture wrap t");
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    check_gl("Set texture wrap r");
-    glTexImage2D(GL_TEXTURE_2D, // target
-                 0,  // level, 0 = base, no minimap,
-                 GL_R16, // internalformat
-                 w,  // width
-                 h,  // height
-                 0,  // border
-                 GL_RED,  // format
-                 GL_UNSIGNED_SHORT, // type
-                 0);
-    check_gl("Texture create");
-  }
-
-  {
-    glGenTextures(1, &texture_id_g);
-    check_gl("Generate texture");
-    glBindTexture(GL_TEXTURE_2D, texture_id_g);
+    glBindTexture(GL_TEXTURE_2D, texture_id[i]);
     check_gl("Bind texture");
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     check_gl("Set texture min filter");
@@ -352,11 +325,17 @@ GLView2D::read_plane()
   if (depth == olddepth)
     return;
 
-  std::cout << "Texture load for depth " << depth << std::endl;
-
-  if (pixels != 0)
+  if (pixels == 0)
     {
-      unsigned int ifd = depth * 2;
+      std::cerr << "Not allocated tiff pixel buffer" << std::endl;
+      return;
+    }
+
+  std::cout << "Texture load for depth " << depth << ".";
+
+  for (unsigned int i = 0; i < 2; ++i)
+    {
+      unsigned int ifd = (depth * 2) + i;
 
       int ok = TIFFSetDirectory(tiff, ifd);
       if (!ok)
@@ -371,7 +350,7 @@ GLView2D::read_plane()
       uint32_t strips = TIFFNumberOfStrips(tiff);
       uint32_t striprows = TIFFGetField(tiff, TIFFTAG_ROWSPERSTRIP, &striprows);
 
-      glBindTexture(GL_TEXTURE_2D, texture_id_r);
+      glBindTexture(GL_TEXTURE_2D, texture_id[i]);
       check_gl("Bind texture");
       for (tstrip_t nstrip = 0, y=0; nstrip < strips; nstrip++, y+=striprows)
         {
@@ -386,53 +365,11 @@ GLView2D::read_plane()
                           pixels);
           check_gl("Texture set pixels in subregion");
         }
-      std::cout << " done.\n";
+      glGenerateMipmap(GL_TEXTURE_2D);
+      check_gl("Generate mipmaps");
     }
-  else
-    std::cerr << "Not allocated tiff pixel buffer" << std::endl;
-  std::cout << "Texture loaded" << std::endl;
-  glGenerateMipmap(GL_TEXTURE_2D);
-  check_gl("Generate mipmaps");
 
-  if (pixels != 0)
-    {
-      unsigned int ifd = 1 + (depth * 2);
-
-      int ok = TIFFSetDirectory(tiff, ifd);
-      if (!ok)
-        std::cout << "Error setting TIFF directory to " << ifd << std::endl;
-      //            std::cout << "Reading IFD " << ifd << " (plane " << z << ")" << std::endl;
-      std::cout << '.';
-
-      uint32_t w, h;
-      TIFFGetField(tiff, TIFFTAG_IMAGEWIDTH, &w);
-      TIFFGetField(tiff, TIFFTAG_IMAGELENGTH, &h);
-
-      uint32_t strips = TIFFNumberOfStrips(tiff);
-      uint32_t striprows = TIFFGetField(tiff, TIFFTAG_ROWSPERSTRIP, &striprows);
-
-      glBindTexture(GL_TEXTURE_2D, texture_id_g);
-      check_gl("Bind texture");
-      for (tstrip_t nstrip = 0, y=0; nstrip < strips; nstrip++, y+=striprows)
-        {
-          TIFFReadEncodedStrip(tiff, nstrip, pixels, (tsize_t) -1);
-          glTexSubImage2D(GL_TEXTURE_2D, // target
-                          0,  // level, 0 = base, no minimap,
-                          0, y,
-                          w,  // width
-                          striprows,  // height
-                          GL_RED,  // format
-                          GL_UNSIGNED_SHORT, // type
-                          pixels);
-          check_gl("Texture set pixels in subregion");
-        }
-      std::cout << " done.\n";
-    }
-  else
-    std::cerr << "Not allocated tiff pixel buffer" << std::endl;
-  std::cout << "Texture loaded" << std::endl;
-  glGenerateMipmap(GL_TEXTURE_2D);
-  check_gl("Generate mipmaps");
+  std::cout << " done.\n";
 
   olddepth = depth;
 }
@@ -495,13 +432,13 @@ GLView2D::render()
 
   glActiveTexture(GL_TEXTURE0);
   check_gl("Activate texture 0");
-  glBindTexture(GL_TEXTURE_2D, texture_id_r);
+  glBindTexture(GL_TEXTURE_2D, texture_id[0]);
   check_gl("Bind texture 0");
   glUniform1i(uniform_texture_r, /*GL_TEXTURE*/1);
   check_gl("Set uniform 0");
   glActiveTexture(GL_TEXTURE1);
   check_gl("Activate texture 1");
-  glBindTexture(GL_TEXTURE_2D, texture_id_g);
+  glBindTexture(GL_TEXTURE_2D, texture_id[1]);
   check_gl("Bind texture 1");
   glUniform1i(uniform_texture_g, /*GL_TEXTURE*/0);
   check_gl("Set uniform 1");

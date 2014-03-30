@@ -75,8 +75,7 @@ private:
   unsigned int vbo_square_vertices;
   unsigned int vbo_square_texcoords;
   unsigned int ibo_square_elements;
-  unsigned int texture_id_r;
-  unsigned int texture_id_g;
+  unsigned int texture_id[2];
   TIFF *tiff;
   uint16_t *pixels;
 };
