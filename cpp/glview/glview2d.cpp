@@ -524,8 +524,8 @@ void GLView2D::mouseMoveEvent(QMouseEvent *event)
         setZoom(zoom + 8 * dy);
         break;
       case MODE_PAN:
-        setXTranslation(xTran + 8 *  dx);
-        setYTranslation(yTran + 8 * -dy);
+        setXTranslation(xTran + 2 *  dx);
+        setYTranslation(yTran + 2 * -dy);
         break;
       case MODE_ROTATE:
         setZRotation(zRot + 8 * -dy);
@@ -551,9 +551,6 @@ void GLView2D::timerEvent (QTimerEvent *event)
   float range = (maxsize/minsize) * 2.0;
   float xrange = (static_cast<float>(s.width())/(minsize * 2.0)) * (maxsize);
   float yrange = (static_cast<float>(s.height())/(minsize * 2.0)) * (maxsize);
-
-  std::cout << "XS = " << s.width() << "  YS = " << s.height() << std::endl;
-  std::cout << "XR = " << xrange << "  YR = " << yrange << std::endl;
 
   glm::vec3 axis_z(0, 0, 1);
 
