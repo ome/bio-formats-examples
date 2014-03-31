@@ -30,6 +30,7 @@ private slots:
 private:
   void createActions();
   void createMenus();
+  void createDockWindows();
 
   QMenu *fileMenu;
   QMenu *viewMenu;

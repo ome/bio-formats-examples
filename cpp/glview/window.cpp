@@ -6,6 +6,8 @@ Window::Window()
 {
   createActions();
   createMenus();
+  createDockWindows();
+  setDockOptions(AllowTabbedDocks);
 
   glView = new GLView2D;
 
@@ -13,10 +15,7 @@ Window::Window()
   // We need a minimum size or else the size defaults to zero.
   glContainer->setMinimumSize(512, 512);
 
-  minSlider=createRangeSlider();
-  maxSlider=createRangeSlider();
 
-  cutSlider = createCutSlider();
 
   connect(minSlider, SIGNAL(valueChanged(int)), glView, SLOT(setChannelMin(int)));
   connect(glView, SIGNAL(channelMinChanged(int)), minSlider, SLOT(setValue(int)));
@@ -28,9 +27,6 @@ Window::Window()
 
   QHBoxLayout *mainLayout = new QHBoxLayout;
   mainLayout->addWidget(glContainer);
-  mainLayout->addWidget(minSlider);
-  mainLayout->addWidget(maxSlider);
-  mainLayout->addWidget(cutSlider);
 
   QWidget *central = new QWidget(this);
   central->setLayout(mainLayout);
@@ -100,6 +96,37 @@ void Window::createMenus()
   viewMenu->addAction(viewZoomAction);
   viewMenu->addAction(viewPanAction);
   viewMenu->addAction(viewRotateAction);
+
+}
+
+void Window::createDockWindows()
+{
+  QDockWidget *dock = new QDockWidget(tr("Navigation"), this);
+  dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+  QVBoxLayout *mainLayout = new QVBoxLayout;
+  cutSlider = createCutSlider();
+  mainLayout->addWidget(cutSlider);
+  QWidget *mainWidget = new QWidget(this);
+  mainWidget->setLayout(mainLayout);
+  dock->setWidget(mainWidget);
+  addDockWidget(Qt::BottomDockWidgetArea, dock);
+
+  viewMenu->addSeparator();
+  viewMenu->addAction(dock->toggleViewAction());
+
+  dock = new QDockWidget(tr("Rendering"), this);
+  dock->setAllowedAreas(Qt::AllDockWidgetAreas);
+  mainLayout = new QVBoxLayout;
+  minSlider=createRangeSlider();
+  maxSlider=createRangeSlider();
+  mainLayout->addWidget(minSlider);
+  mainLayout->addWidget(maxSlider);
+  mainWidget = new QWidget(this);
+  mainWidget->setLayout(mainLayout);
+  dock->setWidget(mainWidget);
+  addDockWidget(Qt::BottomDockWidgetArea, dock);
+
+  viewMenu->addAction(dock->toggleViewAction());
 }
 
 QSlider *Window::createAngleSlider()
@@ -115,7 +142,7 @@ QSlider *Window::createAngleSlider()
 
 QSlider *Window::createRangeSlider()
 {
-  QSlider *slider = new QSlider(Qt::Vertical);
+  QSlider *slider = new QSlider(Qt::Horizontal);
   slider->setRange(0, 255 * 16);
   slider->setSingleStep(16);
   slider->setPageStep(8 * 16);
@@ -127,7 +154,7 @@ QSlider *Window::createRangeSlider()
 // Note hardcoded range
 QSlider *Window::createCutSlider()
 {
-  QSlider *slider = new QSlider(Qt::Vertical);
+  QSlider *slider = new QSlider(Qt::Horizontal);
   slider->setRange(0, 143);
   slider->setSingleStep(1);
   slider->setPageStep(8);
