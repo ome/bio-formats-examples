@@ -1,5 +1,5 @@
-#ifndef GLVIEW_H
-#define GLVIEW_H
+#ifndef GLVIEW3D_H
+#define GLVIEW3D_H
 
 #include "glwindow.h"
 
@@ -8,13 +8,13 @@
 
 #include <glm/glm.hpp>
 
-class GLView : public GLWindow
+class GLView3D : public GLWindow
 {
   Q_OBJECT;
 
 public:
-  GLView(QWidget *parent = 0);
-  ~GLView();
+  GLView3D(QWidget *parent = 0);
+  ~GLView3D();
 
   QSize minimumSizeHint() const;
   QSize sizeHint() const;
@@ -75,7 +75,7 @@ private:
   unsigned int texture_id_g;
 };
 
-#endif // GLVIEW_H
+#endif // GLVIEW3D_H
 
 /*
  * Local Variables:

@@ -3,8 +3,9 @@
 
 #include <math.h>
 
-#include "glview.h"
+#include "glview3d.h"
 
+#define GLM_FORCE_RADIANS
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -53,7 +54,7 @@ namespace
   }
 }
 
-GLView::GLView(QWidget *parent):
+GLView3D::GLView3D(QWidget *parent):
   GLWindow(),
   etimer(),
   xRot(0),
@@ -79,7 +80,7 @@ GLView::GLView(QWidget *parent):
 {
 }
 
-GLView::~GLView()
+GLView3D::~GLView3D()
 {
   makeCurrent();
 
@@ -91,12 +92,12 @@ GLView::~GLView()
     glDeleteBuffers(1, &ibo_cube_elements);
 }
 
-QSize GLView::minimumSizeHint() const
+QSize GLView3D::minimumSizeHint() const
 {
   return QSize(800, 600);
 }
 
-QSize GLView::sizeHint() const
+QSize GLView3D::sizeHint() const
 {
   return QSize(800, 600);
 }
@@ -109,7 +110,7 @@ static void qNormalizeAngle(int &angle)
     angle -= 360 * 16;
 }
 
-void GLView::setXRotation(int angle)
+void GLView3D::setXRotation(int angle)
 {
   qNormalizeAngle(angle);
   if (angle != xRot) {
@@ -119,7 +120,7 @@ void GLView::setXRotation(int angle)
   }
 }
 
-void GLView::setYRotation(int angle)
+void GLView3D::setYRotation(int angle)
 {
   qNormalizeAngle(angle);
   if (angle != yRot) {
@@ -129,7 +130,7 @@ void GLView::setYRotation(int angle)
   }
 }
 
-void GLView::setZRotation(int angle)
+void GLView3D::setZRotation(int angle)
 {
   qNormalizeAngle(angle);
   if (angle != zRot) {
@@ -140,7 +141,7 @@ void GLView::setZRotation(int angle)
 }
 
 
-void GLView::setChannelMin(int min)
+void GLView3D::setChannelMin(int min)
 {
   float v = min / (255.0*16.0);
   if (cmax[0] != v)
@@ -153,7 +154,7 @@ void GLView::setChannelMin(int min)
     setChannelMax(min);
 }
 
-void GLView::setChannelMax(int max)
+void GLView3D::setChannelMax(int max)
 {
   float v = max / (255.0*16.0);
   if (cmax[1] != v)
@@ -167,7 +168,7 @@ void GLView::setChannelMax(int max)
 }
 
 
-void GLView::setZCut(int cut)
+void GLView3D::setZCut(int cut)
 {
   if (depth != cut)
     {
@@ -177,7 +178,7 @@ void GLView::setZCut(int cut)
     }
 }
 
-void GLView::initialize()
+void GLView3D::initialize()
 {
   glEnable(GL_DEPTH_TEST);
   check_gl("Enable depth test");
@@ -411,12 +412,12 @@ void GLView::initialize()
 }
 
 void
-GLView::buffer_cube(unsigned int vbo_vertices,
-                    unsigned int vbo_texcoords,
-                    unsigned int ibo_elements,
-                    glm::vec2 xlim,
-                    glm::vec2 ylim,
-                    glm::vec2 zlim)
+GLView3D::buffer_cube(unsigned int vbo_vertices,
+                      unsigned int vbo_texcoords,
+                      unsigned int ibo_elements,
+                      glm::vec2 xlim,
+                      glm::vec2 ylim,
+                      glm::vec2 zlim)
 {
   GLfloat cube_vertices[] = {
     // front
@@ -524,7 +525,7 @@ GLView::buffer_cube(unsigned int vbo_vertices,
 }
 
 void
-GLView::render()
+GLView3D::render()
 {
   glClearColor(1.0, 1.0, 1.0, 1.0);
   check_gl("Clear colour");
@@ -583,19 +584,19 @@ GLView::render()
   glDisableVertexAttribArray(attr_coordloc);
 }
 
-void GLView::resize()
+void GLView3D::resize()
 {
   QSize newsize = size();
   glViewport(0, 0, newsize.width(), newsize.height());
 }
 
 
-void GLView::mousePressEvent(QMouseEvent *event)
+void GLView3D::mousePressEvent(QMouseEvent *event)
 {
   lastPos = event->pos();
 }
 
-void GLView::mouseMoveEvent(QMouseEvent *event)
+void GLView3D::mouseMoveEvent(QMouseEvent *event)
 {
   int dx = event->x() - lastPos.x();
   int dy = event->y() - lastPos.y();
@@ -610,7 +611,7 @@ void GLView::mouseMoveEvent(QMouseEvent *event)
   lastPos = event->pos();
 }
 
-void GLView::timerEvent (QTimerEvent *event)
+void GLView3D::timerEvent (QTimerEvent *event)
 {
   //int64_t elapsed = etimer.elapsed();
   QSize s = size();
