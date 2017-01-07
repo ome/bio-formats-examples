@@ -6,4 +6,4 @@ env:
   - BUILD=maven
 
 before_install:
-- if [[ $BUILD == 'maven' ]]; then rm build.gradle; fi
+- if [[ $BUILD == 'maven' ]]; then rm build.gradle gradlew; fi
