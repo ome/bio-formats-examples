@@ -15,7 +15,7 @@ repositories {
 }
 
 dependencies {
-    compile(group: 'ome', name: 'bio-formats-tools', version: '5.3.2'){
+    compile(group: 'ome', name: 'bio-formats-tools', version: ‘5.3.3’){
     }
 }
 
