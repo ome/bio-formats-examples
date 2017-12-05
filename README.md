@@ -36,5 +36,5 @@ the Gradle user home directory (`~/.gradle` by default).
 Further Resources
 -----------------
 
-- [Bio-Formats homepage](https://www.openmicroscopy.org/site/products/bio-formats)
-- [Bio-Formats documentation](https://www.openmicroscopy.org/site/support/bio-formats)
+- [Bio-Formats homepage](https://www.openmicroscopy.org/bio-formats)
+- [Bio-Formats documentation](https://docs.openmicroscopy.org/latest/bio-formats/)
