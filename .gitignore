@@ -14,3 +14,4 @@ testng.css
 tools/*.jar
 *.log
 *.xpr
+.gradle

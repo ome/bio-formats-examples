@@ -15,18 +15,28 @@ addons:
     - git
 
 jdk:
+  - oraclejdk9
   - oraclejdk8
   - openjdk7
 
 env:
-  - BUILD=maven
-  - BUILD=ant
+  - BUILD="mvn install"
+  - BUILD="gradle publishToMavenLocal"
 
 matrix:
   fast_finish: true
 
-before_install:
-  - if [[ $BUILD == 'ant' ]]; then pip install --user flake8 Sphinx; fi
+# To avoid "gradle assemble"; gradle version provided doesn't
+# work with Java 9.  Remove when gradle gets updated.
+install:
+  - true
 
 script:
-  - ./tools/test-build $BUILD
+  - $BUILD
+
+# Exclude gradle/java 9 combination until gradle is updated.
+matrix:
+  fast_finish: true
+  exclude:
+    - jdk: oraclejdk9
+      env: BUILD="gradle publishToMavenLocal"
