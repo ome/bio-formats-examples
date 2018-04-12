@@ -1,7 +1,8 @@
-apply plugin: 'application'
 apply plugin: 'java'
+apply plugin: 'maven-publish'
 
-mainClassName = 'loci.formats.tools.ImageInfo'
+group = "ome"
+version = "5.8.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -15,10 +16,32 @@ repositories {
 }
 
 dependencies {
-    compile(group: 'ome', name: 'bio-formats-tools', version: '5.7.3'){
-    }
+    compile(group: 'ome', name: 'formats-api', version: '5.8.1-SNAPSHOT'){}
+    compile(group: 'ome', name: 'formats-bsd', version: '5.8.1-SNAPSHOT'){}
+    compile(group: 'ome', name: 'formats-gpl', version: '5.8.1-SNAPSHOT'){}
 }
 
-run {
-    args Eval.me("['-version']")
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+        }
+    }
 }

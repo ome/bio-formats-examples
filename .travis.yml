@@ -1,9 +1,42 @@
 language: java
+
+# This (sudo: false) is needed to "run on container-based infrastructure" on
+# which cache: is available
+# http://docs.travis-ci.com/user/workers/container-based-infrastructure/
 sudo: false
 
-env:
-  - BUILD=gradle
-  - BUILD=maven
+# http://docs.travis-ci.com/user/caching/#Arbitrary-directories
+cache:
+  directories:
+  - $HOME/.m2
 
-before_install:
-- if [[ $BUILD == 'maven' ]]; then rm build.gradle gradlew; fi
+addons:
+  apt_packages:
+    - git
+
+jdk:
+  - oraclejdk9
+  - oraclejdk8
+  - openjdk7
+
+env:
+  - BUILD="mvn install"
+  - BUILD="gradle publishToMavenLocal"
+
+matrix:
+  fast_finish: true
+
+# To avoid "gradle assemble"; gradle version provided doesn't
+# work with Java 9.  Remove when gradle gets updated.
+install:
+  - true
+
+script:
+  - $BUILD
+
+# Exclude gradle/java 9 combination until gradle is updated.
+matrix:
+  fast_finish: true
+  exclude:
+    - jdk: oraclejdk9
+      env: BUILD="gradle publishToMavenLocal"
