@@ -15,7 +15,7 @@ addons:
     - git
 
 jdk:
-  - oraclejdk9
+  - oraclejdk10
   - oraclejdk8
   - openjdk7
 
@@ -27,16 +27,16 @@ matrix:
   fast_finish: true
 
 # To avoid "gradle assemble"; gradle version provided doesn't
-# work with Java 9.  Remove when gradle gets updated.
+# work with Java 10.  Remove when gradle gets updated.
 install:
   - true
 
 script:
   - $BUILD
 
-# Exclude gradle/java 9 combination until gradle is updated.
+# Exclude gradle/java 10 combination until gradle is updated.
 matrix:
   fast_finish: true
   exclude:
-    - jdk: oraclejdk9
+    - jdk: oraclejdk10
       env: BUILD="gradle publishToMavenLocal"
