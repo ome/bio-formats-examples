@@ -78,10 +78,7 @@
         </includes>
       </resource>
       <resource>
-        <directory>samples</directory>
-        <includes>
-          <include>**/test*</include>
-        </includes>
+        <directory>src/main/resources</directory>
       </resource>
     </resources>
 
@@ -149,6 +146,25 @@
             <goals>
               <goal>parse-version</goal>
             </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>ExampleSuite</mainClass>
+              <arguments>
+                <argument>test.fake</argument>
+              </arguments>
+            </configuration>
           </execution>
         </executions>
       </plugin>
