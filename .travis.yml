@@ -40,3 +40,12 @@ matrix:
   exclude:
     - jdk: oraclejdk10
       env: BUILD="gradle publishToMavenLocal"
+
+deploy:
+  provider: script
+  script: "cp .travis.settings.xml $HOME/.m2/settings.xml && mvn deploy"
+  skip_cleanup: true
+  on:
+    tags: true
+    jdk: oraclejdk8
+    condition: $BUILD = "mvn install"
