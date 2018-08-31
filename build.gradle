@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 group = "ome"
-version = "5.8.1-SNAPSHOT"
+version = "5.9.2"
 
 repositories {
     mavenCentral()
@@ -16,9 +16,9 @@ repositories {
 }
 
 dependencies {
-    compile(group: 'ome', name: 'formats-api', version: '5.8.1-SNAPSHOT'){}
-    compile(group: 'ome', name: 'formats-bsd', version: '5.8.1-SNAPSHOT'){}
-    compile(group: 'ome', name: 'formats-gpl', version: '5.8.1-SNAPSHOT'){}
+    compile(group: 'ome', name: 'formats-api', version: '5.9.2'){}
+    compile(group: 'ome', name: 'formats-bsd', version: '5.9.2'){}
+    compile(group: 'ome', name: 'formats-gpl', version: '5.9.2'){}
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
