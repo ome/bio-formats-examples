@@ -7,7 +7,7 @@
 
   <groupId>ome</groupId>
   <artifactId>bio-formats-examples</artifactId>
-  <version>5.9.2</version>
+  <version>5.9.3-SNAPSHOT</version>
 
   <name>Bio-Formats examples</name>
   <description>Bio-Formats examples</description>

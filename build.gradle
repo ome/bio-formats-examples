@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 group = "ome"
-version = "5.9.2"
+version = "5.9.3-SNAPSHOT"
 
 repositories {
     mavenCentral()
