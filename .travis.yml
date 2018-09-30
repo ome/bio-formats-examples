@@ -21,7 +21,7 @@ jdk:
 
 env:
   - BUILD="mvn install"
-  - BUILD="gradle publishToMavenLocal"
+  - BUILD="gradle publishToMavenLocal exec"
 
 matrix:
   fast_finish: true
