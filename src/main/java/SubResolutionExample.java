@@ -36,7 +36,7 @@ public class SubResolutionExample {
 
   public static void main(String[] args) throws FormatException, IOException {
     // parse command line arguments
-    if (args.length < 1) {
+    if (args.length != 1) {
       System.err.println("Usage: java SubResolutionExample imageFile");
       System.exit(1);
     }
