@@ -55,8 +55,10 @@ public class ExampleSuite {
     // Retrieve local test files
     URL resource =  ExampleSuite.class.getResource("test.fake");
     URL overlappedResource =  ExampleSuite.class.getResource("test&sizeX=1024&sizeY=1024.fake");
+    URL pyramidResource =  ExampleSuite.class.getResource("test&resolutions=4.fake");
     File inputFile = new File(resource.toURI());
     File overlappedInputFile = new File(overlappedResource.toURI());
+    File pyramidFile = new File(pyramidResource.toURI());
     File parentDir = inputFile.getParentFile();
     File convertedFile = new File(parentDir, "converted.ome.tiff");
     File exportFile = new File(parentDir, "export.ome.tiff");
@@ -100,5 +102,6 @@ public class ExampleSuite {
     execute("ReadWriteInMemory", new String[] {inputFile.getAbsolutePath()});
     execute("OrthogonalReader", new String[] {"--input", inputFile.getAbsolutePath(),
       "--output", orthogonalFile.getAbsolutePath()});
+    execute("SubResolutionExample", new String[] { pyramidFile.getAbsolutePath()});
   }
 }
