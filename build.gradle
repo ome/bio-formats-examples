@@ -16,9 +16,9 @@ repositories {
 }
 
 dependencies {
-    compile(group: 'ome', name: 'formats-api', version: '6.0.0-m1'){}
-    compile(group: 'ome', name: 'formats-bsd', version: '6.0.0-m1'){}
-    compile(group: 'ome', name: 'formats-gpl', version: '6.0.0-m1'){}
+    compile(group: 'ome', name: 'formats-api', version: '6.0.0-m2'){}
+    compile(group: 'ome', name: 'formats-bsd', version: '6.0.0-m2'){}
+    compile(group: 'ome', name: 'formats-gpl', version: '6.0.0-m2'){}
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -34,6 +34,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
     archives sourcesJar
     archives javadocJar
+}
+
+task exec(type: JavaExec) {
+    main = 'ExampleSuite'
+    classpath = sourceSets.main.runtimeClasspath
 }
 
 publishing {
