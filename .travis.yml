@@ -38,7 +38,7 @@ script:
 matrix:
   fast_finish: true
   exclude:
-    - jdk: oraclejdk10
+    - jdk: oraclejdk11
       env: BUILD="gradle publishToMavenLocal exec"
 
 deploy:
