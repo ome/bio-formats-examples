@@ -70,6 +70,7 @@ public class ExampleSuite {
     File overlappedTiledFile2 = new File(parentDir, "overlappedTiledFile2.ome.tiff");
     File inMemoryFile = new File(parentDir, inputFile.getName() +".ome.tif");
     File orthogonalFile = new File(parentDir, "orthogonal.ome.tiff");
+    File pyramidOutputFile = new File(parentDir, "generatedPyramid.ome.tiff");
     
     // Remove any existing output files
     Files.deleteIfExists(convertedFile.toPath());
@@ -82,6 +83,7 @@ public class ExampleSuite {
     Files.deleteIfExists(overlappedTiledFile2.toPath());
     Files.deleteIfExists(inMemoryFile.toPath());
     Files.deleteIfExists(orthogonalFile.toPath());
+    Files.deleteIfExists(pyramidOutputFile.toPath());
 
     // Execute examples
     execute("ReadPhysicalSize", new String[] {inputFile.getAbsolutePath()});
@@ -103,5 +105,7 @@ public class ExampleSuite {
     execute("OrthogonalReader", new String[] {"--input", inputFile.getAbsolutePath(),
       "--output", orthogonalFile.getAbsolutePath()});
     execute("SubResolutionExample", new String[] { pyramidFile.getAbsolutePath()});
+    execute("GeneratePyramidResolutions", new String[] {
+      overlappedInputFile.getAbsolutePath(), "2", "4", pyramidOutputFile.getAbsolutePath()});
   }
 }
