@@ -16,9 +16,9 @@ repositories {
 }
 
 dependencies {
-    compile(group: 'ome', name: 'formats-api', version: '6.0.0-m2'){}
-    compile(group: 'ome', name: 'formats-bsd', version: '6.0.0-m2'){}
-    compile(group: 'ome', name: 'formats-gpl', version: '6.0.0-m2'){}
+    compile(group: 'ome', name: 'formats-api', version: '6.0.0-m3'){}
+    compile(group: 'ome', name: 'formats-bsd', version: '6.0.0-m3'){}
+    compile(group: 'ome', name: 'formats-gpl', version: '6.0.0-m3'){}
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
