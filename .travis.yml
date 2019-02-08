@@ -16,8 +16,9 @@ addons:
 
 jdk:
   - oraclejdk11
+  - openjdk11
   - oraclejdk8
-  - openjdk7
+  - openjdk8
 
 env:
   - BUILD="mvn install"
@@ -40,6 +41,8 @@ matrix:
   exclude:
     - jdk: oraclejdk11
       env: BUILD="gradle publishToMavenLocal exec"
+    - jdk: openjdk11
+      env: BUILD="gradle publishToMavenLocal exec"
 
 deploy:
   provider: script
@@ -47,5 +50,5 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    jdk: oraclejdk8
+    jdk: openjdk8
     condition: $BUILD = "mvn install"

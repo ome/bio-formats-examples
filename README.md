@@ -9,7 +9,7 @@ Prerequisites
 
 The following are required:
 
-    JDK 7 or higher
+    JDK 8 or higher
     Maven 3.x (for Maven build)
     Gradle (for Gradle build)
 
