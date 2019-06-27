@@ -15,9 +15,7 @@ addons:
     - git
 
 jdk:
-  - oraclejdk11
   - openjdk11
-  - oraclejdk8
   - openjdk8
 
 env:
