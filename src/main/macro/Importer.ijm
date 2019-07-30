@@ -30,7 +30,9 @@
  * #L%
  */
 
-// This example shows how to open images in a directory using the Bio-Formats Importer plugin 
+// This example shows how to open images in a directory using the Bio-Formats Importer plugin.
+// If the image has ROIs, they will be read and displayed in the ROI manager.
+
 path=getDirectory("Choose a Directory");
 list = getFileList(path);
 length = list.length;
