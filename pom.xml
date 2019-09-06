@@ -154,6 +154,7 @@
               <arguments>
                 <argument>test.fake</argument>
               </arguments>
+              <skip>${skipTests}</skip>
             </configuration>
           </execution>
         </executions>
