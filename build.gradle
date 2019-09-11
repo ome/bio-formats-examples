@@ -2,23 +2,17 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 group = "ome"
-version = "6.1.0-m1"
+version = "6.3.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
-    maven {
-        name 'Unidata'
-        url 'https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases'
-    }
     maven {
         url 'https://artifacts.openmicroscopy.org/artifactory/maven/'
     }
 }
 
 dependencies {
-    compile(group: 'ome', name: 'formats-api', version: '6.1.0-m1'){}
-    compile(group: 'ome', name: 'formats-bsd', version: '6.1.0-m1'){}
-    compile(group: 'ome', name: 'formats-gpl', version: '6.1.0-m1'){}
+    compile(group: 'ome', name: 'formats-gpl', version: '6.2.1'){}
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
