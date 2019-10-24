@@ -154,6 +154,7 @@
               <arguments>
                 <argument>test.fake</argument>
               </arguments>
+              <skip>${skipTests}</skip>
             </configuration>
           </execution>
         </executions>
@@ -201,7 +202,7 @@
     <connection>scm:git:git://github.com/ome/bio-formats-examples</connection>
     <developerConnection>scm:git:git@github.com:ome/bio-formats-examples</developerConnection>
     <tag>HEAD</tag>
-    <url>http://github.com/ome/bio-formats-examples</url>
+    <url>https://github.com/ome/bio-formats-examples</url>
   </scm>
 
   <!-- NB: for parent project -->
@@ -211,11 +212,6 @@
       <name>Central Repository</name>
       <url>https://repo.maven.apache.org/maven2</url>
     </repository>
-    <repository>
-      <id>unidata.releases</id>
-      <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
-      <snapshots><enabled>false</enabled></snapshots>
-      </repository>
     <repository>
       <id>ome</id>
       <name>OME Artifactory</name>
