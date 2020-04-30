@@ -7,7 +7,7 @@
 
   <groupId>ome</groupId>
   <artifactId>bio-formats-examples</artifactId>
-  <version>6.4.1-SNAPSHOT</version>
+  <version>6.5.0</version>
 
   <name>Bio-Formats examples</name>
   <description>Bio-Formats examples</description>
@@ -23,7 +23,7 @@
   </licenses>
 
   <properties>
-    <formats-gpl.version>6.4.0</formats-gpl.version>
+    <formats-gpl.version>6.5.0</formats-gpl.version>
     <logback.version>1.1.1</logback.version>
 
     <!-- NB: Avoid platform encoding warning when copying resources. -->
