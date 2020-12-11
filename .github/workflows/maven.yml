@@ -37,7 +37,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      server: ome.snapshots
+      server: ome.staging
     steps:
       - uses: actions/checkout@v2
       - name: Set up Repository
