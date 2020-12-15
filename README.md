@@ -1,6 +1,9 @@
 Bio-Formats examples
 ====================
 
+[![Actions Status](https://github.com/ome/bio-formats-examples/workflows/Gradle/badge.svg)](https://github.com/ome/bioformats/actions)
+[![Actions Status](https://github.com/ome/bio-formats-examples/workflows/Maven/badge.svg)](https://github.com/ome/bioformats/actions)
+
 This repository contains minimal examples of usage of Bio-Formats as a Java
 library using either Maven or Gradle.
 
