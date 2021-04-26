@@ -221,8 +221,10 @@ public class FileExport {
 
   /**
    * To export a file to OME-TIFF:
-   *
+   * 
    * $ java FileExport output-file.ome.tiff
+   * @param args Output file.
+   * @throws java.lang.Exception thrown if an error occurred while exporting data.
    */
   public static void main(String[] args) throws Exception {
     FileExport exporter = new FileExport(args[0]);

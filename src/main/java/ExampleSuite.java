@@ -49,6 +49,8 @@ public class ExampleSuite {
    * Execute a series of examples using the test files
    *
    * $ java ExampleSuite
+   * @param args Possible configuration
+   * @throws java.lang.Exception thrown if an error occurred while reading data.
    */
   public static void main(String[] args) throws Exception {
 

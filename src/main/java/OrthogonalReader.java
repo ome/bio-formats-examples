@@ -50,6 +50,13 @@ public class OrthogonalReader {
 
     private boolean debug;
 
+    
+  /**
+   * Launches the Orthogonal reader.
+   *
+   * @param args Input files, Output files and debugging option.
+   * @throws Exception thrown if an error occurred while reading data.
+   */
     public static void main(String[] args) throws Throwable {
         log.info("Orthogonal reader started");
         OrthogonalReader main = new OrthogonalReader();

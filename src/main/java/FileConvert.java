@@ -181,8 +181,9 @@ public class FileConvert {
 
   /**
    * To convert a file on the command line:
-   *
+   * 
    * $ java FileConvert input-file.oib output-file.ome.tiff
+   * @param args Input File and Output file.
    */
   public static void main(String[] args) {
     FileConvert converter = new FileConvert(args[0], args[1]);

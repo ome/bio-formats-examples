@@ -34,6 +34,13 @@ import loci.formats.ImageReader;
  */
 public class SubResolutionExample {
 
+  /**
+   * Use the sub-resolution API.
+   *
+   * @param args inputFile
+   * @throws IOException thrown if unable to setup input or output stream for reader or writer
+   * @throws FormatException thrown when setting invalid values in reader or writer 
+   */
   public static void main(String[] args) throws FormatException, IOException {
     // parse command line arguments
     if (args.length != 1) {

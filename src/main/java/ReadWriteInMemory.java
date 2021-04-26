@@ -38,6 +38,16 @@ import loci.formats.services.OMEXMLService;
  */
 public class ReadWriteInMemory {
 
+
+  /**
+   * Reads to and from byte arrays in memory.
+   * 
+   * @param args Input file.
+   * @throws IOException thrown if unable to setup input or output stream for reader or writer
+   * @throws FormatException thrown when setting invalid values in reader or writer
+   * @throws ServiceException thrown if unable to create OME-XML meta data
+   * @throws DependencyException thrown if failed to create an OMEXMLService
+   */
   public static void main(String[] args)
     throws DependencyException, FormatException, IOException, ServiceException
   {

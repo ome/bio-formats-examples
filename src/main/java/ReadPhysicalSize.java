@@ -84,6 +84,9 @@ public class ReadPhysicalSize {
    * To read the physical size dimensions and units of a file and display them in micrometers:
    *
    * $ java ReadPhysicalSize input-file.ome.tiff
+   * @param args Input file.
+   * @throws FormatException if a parsing error occurs processing the file.
+   * @throws IOException if an I/O error occurs processing the file
    */
   public static void main(String[] args) throws Exception {
     readPhysicalSize(args[0]);

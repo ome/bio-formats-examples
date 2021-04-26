@@ -175,6 +175,7 @@ public class TiledReaderWriter {
    * To read an image file and write out an OME-Tiff tiled image on the command line:
    *
    * $ java TiledReaderWriter input-file.oib output-file.ome.tiff 256 256
+   * @param args inputFile, outputFile, tileSizeX and tileSizeY
    * @throws IOException thrown if unable to setup input or output stream for reader or writer
    * @throws FormatException thrown when setting invalid values in reader or writer
    * @throws ServiceException thrown if unable to create OME-XML meta data
