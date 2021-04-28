@@ -361,8 +361,8 @@ public class FileExportSPW {
    *
    * $ java FileExportSPW output-file.ome.tiff
    *
-   * @param args
-   * @throws java.lang.Exception
+   * @param args Output file
+   * @throws Exception thrown if an error occurred while exporting data.
    */
   public static void main(String[] args) throws Exception {
     
