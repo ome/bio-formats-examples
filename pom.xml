@@ -199,7 +199,7 @@
   </mailingLists>
 
   <scm>
-    <connection>scm:git:git://github.com/ome/bio-formats-examples</connection>
+    <connection>scm:git:https://github.com/ome/bio-formats-examples</connection>
     <developerConnection>scm:git:git@github.com:ome/bio-formats-examples</developerConnection>
     <tag>HEAD</tag>
     <url>https://github.com/ome/bio-formats-examples</url>
