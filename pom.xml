@@ -216,6 +216,11 @@
       <id>ome</id>
       <name>OME Artifactory</name>
       <url>https://artifacts.openmicroscopy.org/artifactory/maven/</url>
+    </repository>    
+    <repository>
+      <id>unidata.releases</id>
+      <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
+      <snapshots><enabled>false</enabled></snapshots>
     </repository>
   </repositories>
 
