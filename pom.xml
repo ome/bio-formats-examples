@@ -24,7 +24,7 @@
 
   <properties>
     <formats-gpl.version>6.10.0</formats-gpl.version>
-    <logback.version>1.2.0</logback.version>
+    <logback.version>1.2.9</logback.version>
 
     <!-- NB: Avoid platform encoding warning when copying resources. -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
