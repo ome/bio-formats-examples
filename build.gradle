@@ -9,6 +9,10 @@ repositories {
     maven {
         url 'https://artifacts.openmicroscopy.org/artifactory/maven/'
     }
+    maven {
+        name 'Unidata'
+        url 'https://artifacts.glencoesoftware.com/artifactory/unidata-releases'
+    }
 }
 
 dependencies {
