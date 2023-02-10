@@ -24,7 +24,7 @@
 
   <properties>
     <formats-gpl.version>6.11.1</formats-gpl.version>
-    <logback.version>1.2.9</logback.version>
+    <logback.version>1.2.11</logback.version>
 
     <!-- NB: Avoid platform encoding warning when copying resources. -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -42,12 +42,6 @@
       <groupId>${project.groupId}</groupId>
       <artifactId>formats-gpl</artifactId>
       <version>${formats-gpl.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-core</artifactId>
-      <version>${logback.version}</version>
     </dependency>
     <dependency>
       <groupId>ch.qos.logback</groupId>
