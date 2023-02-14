@@ -2,17 +2,22 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 group = "ome"
-version = "6.7.0-SNAPSHOT"
+version = "6.12.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
     maven {
         url 'https://artifacts.openmicroscopy.org/artifactory/maven/'
     }
+    maven {
+        name 'Unidata'
+        url 'https://artifacts.glencoesoftware.com/artifactory/unidata-releases'
+    }
 }
 
 dependencies {
-    implementation(group: 'ome', name: 'formats-gpl', version: '6.6.1'){}
+    implementation group: 'ome', name: 'formats-gpl', version: '6.11.1'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.11'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
