@@ -23,17 +23,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
-      - name: Cache Gradle packages
-        uses: actions/cache@v2
+      - uses: gradle/gradle-build-action@v2
         with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: ${{ runner.os }}-gradle
-      - name: Wrap with specified version
-        run: gradle wrapper --gradle-version=${{ env.gradle_version }}
-        if: ${{ env.gradle_version != '' }}
-      - name: Wrap without version
-        run: gradle wrapper
-        if: ${{ env.gradle_version == '' }}
+          gradle-version: ${{ env.gradle_version }}
       - name: Run commands
-        run: ./gradlew ${{ env.gradle_commands }}
+        run: gradle ${{ env.gradle_commands }}
