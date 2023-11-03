@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven-publish'
 
 group = "ome"
-version = "6.12.0-SNAPSHOT"
+version = "7.1.0-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -16,8 +16,8 @@ repositories {
 }
 
 dependencies {
-    implementation group: 'ome', name: 'formats-gpl', version: '6.11.1'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.3.5'
+    implementation group: 'ome', name: 'formats-gpl', version: '7.0.1'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.3.11'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
