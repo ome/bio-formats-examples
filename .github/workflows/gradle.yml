@@ -18,14 +18,14 @@ jobs:
       gradle_version: 7.6 # set to empty to build with most recent version of gradle
       gradle_commands: publishToMavenLocal exec # default is build
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: ${{ matrix.java }}
           distribution: 'zulu'
           cache: 'gradle'
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           gradle-version: ${{ env.gradle_version }}
       - name: Run commands
