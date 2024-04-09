@@ -15,7 +15,7 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     env:
-      gradle_version: 7.6 # set to empty to build with most recent version of gradle
+      gradle_version: 8.7 # set to empty to build with most recent version of gradle
       gradle_commands: publishToMavenLocal exec # default is build
     steps:
       - uses: actions/checkout@v4
