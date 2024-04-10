@@ -32,4 +32,4 @@ jobs:
       - name: Run matlab tests
         if: runner.os != 'windows'
         run: |
-          docker run -t openmicroscopy/bio-formats-octave src/main/matlab/bftest.m
+          docker run -t -v $(pwd)/src/:/src/ openmicroscopy/bio-formats-octave /src/main/matlab/bftest.m
