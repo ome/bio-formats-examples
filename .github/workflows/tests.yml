@@ -31,4 +31,5 @@ jobs:
         run: colima start
       - name: Run matlab tests
         run: |
+          #sed -i.bak '1s/^/pkg load bioformats\n /' src/main/matlab/bftest.m
           docker run -t -v $(pwd)/src/:/src/ openmicroscopy/bio-formats-octave /src/main/matlab/bftest.m
