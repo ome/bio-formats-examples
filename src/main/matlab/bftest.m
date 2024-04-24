@@ -1,3 +1,6 @@
+% Load Bio-Formats
+pkg load bioformats
+
 bfCheckJavaPath();
 
 % Create local file for testing

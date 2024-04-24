@@ -1,0 +1,35 @@
+# Run the tests
+---
+name: Test
+
+on: 
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup docker
+        if: runner.os == 'macos'
+        run: |
+          brew install docker
+          brew install docker-compose
+      - name: Symlink (compose is now a cli-plugins)
+        if: runner.os == 'macos'
+        run: |
+          mkdir -p ~/.docker/cli-plugins
+          ln -sfn /usr/local/opt/docker-compose/bin/docker-compose ~/.docker/cli-plugins/docker-compose
+      - name: Start docker
+        if: runner.os == 'macos'
+        run: colima start
+      - name: Run matlab tests
+        run: |
+          #sed -i.bak '1s/^/pkg load bioformats\n /' src/main/matlab/bftest.m
+          docker run -t -v $(pwd)/src/:/src/ openmicroscopy/bio-formats-octave /src/main/matlab/bftest.m
