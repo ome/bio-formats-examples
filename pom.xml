@@ -7,7 +7,7 @@
 
   <groupId>ome</groupId>
   <artifactId>bio-formats-examples</artifactId>
-  <version>8.1.0-SNAPSHOT</version>
+  <version>8.1.0</version>
 
   <name>Bio-Formats examples</name>
   <description>Bio-Formats examples</description>
@@ -23,7 +23,7 @@
   </licenses>
 
   <properties>
-    <formats-bsd.version>8.0.0</formats-bsd.version>
+    <formats-bsd.version>8.1.0</formats-bsd.version>
     <logback.version>1.3.15</logback.version>
 
     <!-- NB: Avoid platform encoding warning when copying resources. -->
