@@ -184,35 +184,18 @@
 
   <organization>
     <name>Open Microscopy Environment</name>
-    <url>http://www.openmicroscopy.org/</url>
+    <url>https://www.openmicroscopy.org/</url>
   </organization>
 
   <issueManagement>
-    <system>Trac</system>
-    <url>https://trac.openmicroscopy.org/ome</url>
+    <system>GitHub</system>
+    <url>https://github.com/ome/bio-formats-examples/issues</url>
   </issueManagement>
 
   <ciManagement>
-    <system>Jenkins</system>
-    <url>https://ci.openmicroscopy.org/</url>
+    <system>GitHub Actions</system>
+    <url>https://github.com/ome/bio-formats-examples/issues</url>
   </ciManagement>
-
-  <mailingLists>
-    <mailingList>
-      <name>OME-users</name>
-      <subscribe>http://lists.openmicroscopy.org.uk/mailman/listinfo/ome-users/</subscribe>
-      <unsubscribe>http://lists.openmicroscopy.org.uk/mailman/listinfo/ome-users/</unsubscribe>
-      <post>ome-users@lists.openmicroscopy.org.uk</post>
-      <archive>http://lists.openmicroscopy.org.uk/pipermail/ome-users/</archive>
-    </mailingList>
-    <mailingList>
-      <name>OME-devel</name>
-      <subscribe>http://lists.openmicroscopy.org.uk/mailman/listinfo/ome-devel/</subscribe>
-      <unsubscribe>http://lists.openmicroscopy.org.uk/mailman/listinfo/ome-devel/</unsubscribe>
-      <post>ome-devel@lists.openmicroscopy.org.uk</post>
-      <archive>http://lists.openmicroscopy.org.uk/pipermail/ome-devel/</archive>
-    </mailingList>
-  </mailingLists>
 
   <scm>
     <connection>scm:git:https://github.com/ome/bio-formats-examples</connection>
