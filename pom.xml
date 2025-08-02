@@ -218,19 +218,10 @@
     </repository>    
     <repository>
       <id>unidata.releases</id>
-      <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases</url>
+      <url>https://artifacts.unidata.ucar.edu/repository/unidata-releases/</url>
       <snapshots><enabled>false</enabled></snapshots>
     </repository>
   </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>central</id>
-      <name>Central Repository</name>
-      <url>https://repo.maven.apache.org/maven2</url>
-      <layout>default</layout>
-    </pluginRepository>
-  </pluginRepositories>
 
   <distributionManagement>
     <snapshotRepository>
