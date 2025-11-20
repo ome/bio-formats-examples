@@ -160,7 +160,8 @@ public class ReadWriteInMemory {
     // flush output byte array to disk
     System.out.println();
     System.out.println("Flushing image data to disk...");
-    File outFile = new File(fileName + ".ome.tif");
+    String outFileName = args.length > 1 ? args[1] : fileName + ".ome.tif";
+    File outFile = new File(outFileName);
     DataOutputStream out = new DataOutputStream(new FileOutputStream(outFile));
     out.write(outBytes);
     out.close();
