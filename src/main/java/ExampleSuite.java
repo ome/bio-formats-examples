@@ -103,7 +103,7 @@ public class ExampleSuite {
         overlappedInputFile.getAbsolutePath(), overlappedTiledFile.getAbsolutePath(), "96", "96"});
     execute("OverlappedTiledWriter", new String[] {
         overlappedInputFile.getAbsolutePath(), overlappedTiledFile2.getAbsolutePath(), "192", "96"});
-    execute("ReadWriteInMemory", new String[] {inputFile.getAbsolutePath()});
+    execute("ReadWriteInMemory", new String[] {inputFile.getAbsolutePath(), inMemoryFile.getAbsolutePath()});
     execute("OrthogonalReader", new String[] {"--input", inputFile.getAbsolutePath(),
       "--output", orthogonalFile.getAbsolutePath()});
     execute("SubResolutionExample", new String[] { pyramidFile.getAbsolutePath()});
