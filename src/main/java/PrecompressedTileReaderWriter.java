@@ -63,6 +63,9 @@ public class PrecompressedTileReaderWriter {
   /** The file to be written. */
   private String outputFile;
 
+  /** Compression type. */
+  private String compression;
+
   /**
    * Construct a new PrecompressedTileReaderWriter to read the specified input file
    * and write the given output file. Tile sizes are calculated automatically.
@@ -102,7 +105,7 @@ public class PrecompressedTileReaderWriter {
 
     ICompressedTileReader tileReader = (ICompressedTileReader) reader;
     CompressionType type = CompressionType.get(tileReader.getTileCodec(0));
-    String compression = type.getCompression();
+    compression = type.getCompression();
 
     // set up the writer and associate it with the output file
     ImageWriter baseWriter = new ImageWriter();
@@ -110,7 +113,6 @@ public class PrecompressedTileReaderWriter {
     // is usually important
     baseWriter.setWriteSequentially(true);
     baseWriter.setMetadataRetrieve(omexml);
-    baseWriter.setInterleaved(reader.isInterleaved() || compression.startsWith("JPEG"));
 
     // set the tile size height and width for writing
     // tile size must match between reader and writer when
@@ -144,41 +146,64 @@ public class PrecompressedTileReaderWriter {
 
         // tile size can vary across resolutions,
         // so make sure it gets updated before starting to write
+        // for truly precompressed data, use the tile dimensions
+        // from the reader
+        // for data that isn't compatible with precompression,
+        // use the (possibly adjusted) tile dimensions returned
+        // by the writer
         int tileWidth = reader.getOptimalTileWidth();
         int tileHeight = reader.getOptimalTileHeight();
-        writer.setTileSizeX(tileWidth);
-        writer.setTileSizeY(tileHeight);
+        int tw = writer.setTileSizeX(tileWidth);
+        int th = writer.setTileSizeY(tileHeight);
 
-        // in practice, warning and switching to a normal decompress/recompress
-        // workflow here may be a better strategy
-        // an exception is thrown here to make it very clear that not all
-        // input/output combinations can be used with this feature
+        // in practice, many input datasets will have a mix of compression
+        // types, especially between the "real" image data and the label/macro/etc.
+        // this level of flexibility isn't supported in the precompressed writing API
+        // at the moment, so anything not matching the expected compression settings
+        // will need to be recompressed
         if (!FormatTools.canUsePrecompressedTiles(reader, writer, series, res)) {
-          throw new FormatException("Cannot use precompressed tiles for series " +
+          System.out.println("Cannot use precompressed tiles for series " +
             series + ", resolution " + res);
+
+          // proceed with a standard conversion for this resolution
+          writer.setInterleaved(reader.isInterleaved());
+          for (int image=0; image<reader.getImageCount(); image++) {
+            for (int y=0; y<reader.getSizeY(); y+=th) {
+              int height = (int) Math.min(th, reader.getSizeY() - y);
+              for (int x=0; x<reader.getSizeX(); x+=tw) {
+                int width = (int) Math.min(tw, reader.getSizeX() - x);
+
+                buf = reader.openBytes(image, x, y, width, height);
+                writer.saveBytes(image, buf, x, y, width, height);
+              }
+            }
+          }
         }
+        else {
+          writer.setInterleaved(reader.isInterleaved() || compression.startsWith("JPEG"));
 
-        // convert each image in the current series
-        for (int image=0; image<reader.getImageCount(); image++) {
-          ICompressedTileReader tileReader = (ICompressedTileReader) reader;
+          // convert each image in the current series
+          for (int image=0; image<reader.getImageCount(); image++) {
+            ICompressedTileReader tileReader = (ICompressedTileReader) reader;
 
-          // precompressed API operates on tile row/column indexes, not XY pixel coordinates
-          // this is to prevent trying to read a tile that doesn't align with the boundaries
-          // of the compressed tile
-          int nXTiles = tileReader.getTileColumns(image);
-          int nYTiles = tileReader.getTileRows(image);
+            // precompressed API operates on tile row/column indexes, not XY pixel coordinates
+            // this is to prevent trying to read a tile that doesn't align with the boundaries
+            // o the compressed tile
+            int nXTiles = tileReader.getTileColumns(image);
+            int nYTiles = tileReader.getTileRows(image);
 
-          for (int y=0; y<nYTiles; y++) {
-            for (int x=0; x<nXTiles; x++) {
-              // the x and y coordinates for the current tile
-              int tileX = x * tileWidth;
+            for (int y=0; y<nYTiles; y++) {
               int tileY = y * tileHeight;
-              int width = (int) Math.min(tileWidth, reader.getSizeX() - tileX);
               int height = (int) Math.min(tileHeight, reader.getSizeY() - tileY);
+              for (int x=0; x<nXTiles; x++) {
+                // the x and y coordinates for the current tile
+                int tileX = x * tileWidth;
+                int width = (int) Math.min(tileWidth, reader.getSizeX() - tileX);
 
-              // read tiles from the input file and write them to the output file
-              buf = tileReader.openCompressedBytes(image, x, y);
-              ((ICompressedTileWriter) writer).saveCompressedBytes(image, buf, tileX, tileY, width, height);
+                // read tiles from the input file and write them to the output file
+                buf = tileReader.openCompressedBytes(image, x, y);
+                ((ICompressedTileWriter) writer).saveCompressedBytes(image, buf, tileX, tileY, width, height);
+              }
             }
           }
         }
