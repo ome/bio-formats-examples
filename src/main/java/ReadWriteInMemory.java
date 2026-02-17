@@ -90,7 +90,7 @@ public class ReadWriteInMemory {
     System.out.println();
     System.out.println("Reading image data from memory...");
 
-    /* read-start */
+    /* reader-start */
     ServiceFactory factory = new ServiceFactory();
     OMEXMLService service = factory.getInstance(OMEXMLService.class);
     IMetadata omeMeta = service.createOMEXMLMetadata();
@@ -98,7 +98,7 @@ public class ReadWriteInMemory {
     ImageReader reader = new ImageReader();
     reader.setMetadataStore(omeMeta);
     reader.setId(inId);
-    /* read-end */
+    /* reader-end */
 
     int seriesCount = reader.getSeriesCount();
     int imageCount = reader.getImageCount();
