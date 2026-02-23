@@ -133,7 +133,7 @@ public class SimpleTiledWriter {
    * @throws IOException thrown if unable to setup input or output stream for reader or writer
    */
   public void readWriteTiles() throws FormatException, DependencyException, ServiceException, IOException {
-    /* tiling-writer-example-start */
+    /* convert-tiles-example-start */
     byte[] buf = new byte[FormatTools.getPlaneSize(reader)];
 
     for (int series=0; series<reader.getSeriesCount(); series++) {
@@ -148,7 +148,7 @@ public class SimpleTiledWriter {
         writer.saveBytes(image, buf);
       }
     }
-    /* tiling-writer-example-end */
+    /* convert-tiles-example-end */
   }
 
   /** Close the file reader and writer. */
