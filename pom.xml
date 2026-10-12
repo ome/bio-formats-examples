@@ -214,8 +214,13 @@
     <repository>
       <id>ome</id>
       <name>OME Artifactory</name>
-      <url>https://artifacts.openmicroscopy.org/artifactory/maven/</url>
-    </repository>    
+      <url>https://artifacts.openmicroscopy.org/artifactory/ome.releases/</url>
+    </repository>
+    <repository>
+      <id>scijava</id>
+      <name>SciJava third party</name>
+      <url>https://maven.scijava.org/content/repositories/thirdparty/</url>
+    </repository>
     <repository>
       <id>unidata.releases</id>
       <url>https://artifacts.unidata.ucar.edu/repository/unidata-releases/</url>
