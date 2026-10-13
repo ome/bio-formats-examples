@@ -12,9 +12,8 @@ Prerequisites
 
 The following are required:
 
-    JDK 8 or higher
+    JDK 11 or higher
     Maven 3.x (for Maven build)
-    Gradle (for Gradle build)
 
 Building with Maven
 -------------------
@@ -31,7 +30,7 @@ Building with Gradle
 
 From the root directory, run:
 
-    gradle
+    ./gradlew clean build exec
 
 Downloaded files (including the Gradle distribution itself) will be stored in
 the Gradle user home directory (`~/.gradle` by default).

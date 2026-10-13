@@ -1,23 +1,29 @@
-apply plugin: 'java'
-apply plugin: 'maven-publish'
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
 
 group = "ome"
 version = "8.6.0-SNAPSHOT"
 
+
 repositories {
     mavenCentral()
     maven {
-        url 'https://artifacts.openmicroscopy.org/artifactory/maven/'
+        url = 'https://artifacts.openmicroscopy.org/artifactory/ome.releases/'
     }
     maven {
-        name 'Unidata'
-        url 'https://artifacts.glencoesoftware.com/artifactory/unidata-releases'
+        url = 'https://maven.scijava.org/content/repositories/thirdparty/'
+    }
+    maven {
+        name = 'Unidata'
+        url = 'https://artifacts.openmicroscopy.org/artifactory/unidata-releases'
     }
 }
 
 dependencies {
-    implementation group: 'ome', name: 'formats-bsd', version: '8.5.0'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.3.16'
+    implementation "ome:formats-bsd:8.5.0"
+    implementation "ch.qos.logback:logback-classic:1.3.16"
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -30,13 +36,13 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
-artifacts {
-    archives sourcesJar
-    archives javadocJar
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
 
 task exec(type: JavaExec) {
-    main = 'ExampleSuite'
+    mainClass = 'ExampleSuite'
     classpath = sourceSets.main.runtimeClasspath
 }
 
