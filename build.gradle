@@ -3,7 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
-group = "ome"
+group = "org.openmicroscopy"
 version = "8.6.0-SNAPSHOT"
 
 
