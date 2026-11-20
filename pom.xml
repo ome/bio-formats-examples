@@ -39,7 +39,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>ome</groupId>
       <artifactId>formats-bsd</artifactId>
       <version>${formats-bsd.version}</version>
     </dependency>
